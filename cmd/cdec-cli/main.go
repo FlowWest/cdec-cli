@@ -28,6 +28,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	if os.Args[1] == "--help" {
+		fmt.Println("Usage: cdec-cli <command> [arguments]")
+		os.Exit(1)
+	}
 	var options queryOptions
 
 	switch os.Args[1] {
