@@ -10,7 +10,10 @@ import (
 	"os"
 )
 
-const cdecBaseUrl = "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet"
+var cdecUrls = map[string]string{
+	"query":    "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet",
+	"stations": "https://cdec.water.ca.gov/dynamicapp/staMeta",
+}
 
 type queryOptions struct {
 	station   string
@@ -55,7 +58,7 @@ func main() {
 
 			logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
-			u, err := url.Parse(cdecBaseUrl)
+			u, err := url.Parse(cdecUrls["query"])
 			if err != nil {
 				logger.Println("error trying to encode the url")
 				return
