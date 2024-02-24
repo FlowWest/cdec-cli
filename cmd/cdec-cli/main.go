@@ -35,14 +35,24 @@ type stationOptions struct {
 	stationId string
 }
 
-func findTable(n *html.Node) {
-	if n.Type == html.ElementNode && n.Data == "table" {
-		fmt.Println("Found table tag:", n.Data)
-		return
+func findTables(n *html.Node) []*html.Node {
+	var tables []*html.Node
+
+	var findTable func(n *html.Node)
+	findTable = func(*html.Node) {
+		if n.Type == html.ElementNode && n.Data == "table" {
+			tables = append(tables, n)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			findTable(c)
+		}
+
 	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		findTable(c)
-	}
+	return tables
+}
+
+func parseHTMLTable(n *html.Node) (string, string) {
+
 }
 
 func main() {
