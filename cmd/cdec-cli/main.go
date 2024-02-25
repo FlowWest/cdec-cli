@@ -164,7 +164,6 @@ func main() {
 
 			u.RawQuery = params.Encode()
 
-			fmt.Printf("the url: %s\n", u.String())
 			resp, err := http.Get(u.String())
 			if err != nil {
 				logger.Println("error trying to reach the statiosn endpoint")
@@ -179,9 +178,9 @@ func main() {
 			allTables := findTables(doc)
 			tableData := parseHTMLMetadataTable(allTables[0])
 			for key, value := range tableData {
-				fmt.Printf("Key: %s, Value: %s\n", key, value)
+				fmt.Printf("%s - %s\n", key, value)
 			}
-			logger.Printf("you are trying to get info for %s", stationOptions.stationId)
+			fmt.Printf("\n\nView additional details: %s\n", u.String())
 		}
 	}
 	flag.Parse()
