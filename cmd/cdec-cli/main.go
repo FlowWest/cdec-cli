@@ -13,8 +13,9 @@ import (
 )
 
 var cdecUrls = map[string]string{
-	"query":    "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet",
-	"stations": "https://cdec.water.ca.gov/dynamicapp/staMeta",
+	"query":     "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet",
+	"stations":  "https://cdec.water.ca.gov/dynamicapp/staMeta",
+	"nearbyMap": "https://cdec.water.ca.gov/webgis/?appid=cdecstation",
 }
 
 type cliCmd struct {
@@ -62,12 +63,14 @@ func parseHTMLMetadataTable(n *html.Node) map[string]string {
 			break
 		}
 	}
-	trnode := tbodyNode.FirstChild
-	for tdnode := trnode.FirstChild; tdnode != nil; tdnode = tdnode.NextSibling {
-		if tdnode.FirstChild.Type == html.ElementNode && tdnode.FirstChild.Data == "b" {
-			currentKey = tdnode.FirstChild.FirstChild.Data
-		} else {
-			data[currentKey] = tdnode.FirstChild.Data
+	for trnode := tbodyNode.FirstChild; trnode != nil; trnode = trnode.NextSibling {
+
+		for tdnode := trnode.FirstChild; tdnode != nil; tdnode = tdnode.NextSibling {
+			if tdnode.FirstChild.Type == html.ElementNode && tdnode.FirstChild.Data == "b" {
+				currentKey = tdnode.FirstChild.FirstChild.Data
+			} else {
+				data[currentKey] = tdnode.FirstChild.Data
+			}
 		}
 	}
 	return data
@@ -86,15 +89,21 @@ func main() {
 	fmt.Println(asciiArt)
 
 	// Add your tool's output below
-	if len(os.Args) < 2 {
+	if len(os.Args) < 2 || os.Args[1] == "--help" {
 		fmt.Println("Usage: cdec-cli <command> [arguments]")
+		fmt.Println("")
+		fmt.Println("These are commands available on cdec-cli, as well as few examples for each")
+		usageQuery := `
+Query data from CDEC services by providing a station id, sensor number and duration code
+	cdec-cli query -station=WLK -sensor=01 -duration=e -startdate=2024-02-01 enddate=2024-02-02 
+
+Query station metadata by providing a station id.
+	cdec-cli station -stationID=WLK
+		`
+		fmt.Println(usageQuery)
 		os.Exit(1)
 	}
 
-	if os.Args[1] == "--help" {
-		fmt.Println("Usage: cdec-cli <command> [arguments]")
-		os.Exit(1)
-	}
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	switch os.Args[1] {
@@ -181,7 +190,9 @@ func main() {
 				fmt.Printf("%s - %s\n", key, value)
 			}
 			fmt.Printf("\n\nView additional details: %s\n", u.String())
+			fmt.Printf("View on a map: %s&sta=%s", cdecUrls["nearbyMap"], stationOptions.stationId)
 		}
+
 	}
 	flag.Parse()
 
