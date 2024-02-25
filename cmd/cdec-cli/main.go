@@ -52,7 +52,7 @@ func findTables(n *html.Node) []*html.Node {
 	return tables
 }
 
-func parseHTMLTable(n *html.Node) map[string]string {
+func parseHTMLMetadataTable(n *html.Node) map[string]string {
 	data := make(map[string]string)
 	var currentKey string
 	var tbodyNode *html.Node
@@ -75,8 +75,17 @@ func parseHTMLTable(n *html.Node) map[string]string {
 }
 
 func main() {
-	fmt.Println("Welcome to the CDEC CLI!")
+	// fmt.Println("Welcome to the CDEC CLI!")
+	asciiArt := `
+  ________  _________  _______   ____
+ / ___/ _ \/ __/ ___/ / ___/ /  /  _/
+/ /__/ // / _// /__  / /__/ /___/ /  
+\___/____/___/\___/  \___/____/___/  
+                                     
+`
+	fmt.Println(asciiArt)
 
+	// Add your tool's output below
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: cdec-cli <command> [arguments]")
 		os.Exit(1)
@@ -168,9 +177,7 @@ func main() {
 				return
 			}
 			allTables := findTables(doc)
-			fmt.Printf("the type for the table: %T\n", allTables[0])
-			fmt.Println("total tables found:", len(allTables))
-			tableData := parseHTMLTable(allTables[0])
+			tableData := parseHTMLMetadataTable(allTables[0])
 			for key, value := range tableData {
 				fmt.Printf("Key: %s, Value: %s\n", key, value)
 			}
