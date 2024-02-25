@@ -51,7 +51,20 @@ func findTables(n *html.Node) []*html.Node {
 	return tables
 }
 
-func parseHTMLTable(n *html.Node) (string, string) {
+func parseHTMLTable(n *html.Node) map[string]string {
+	var data map[string]string
+	var currentKey string
+	tbody := n.FirstChild
+	trnode := tbody.FirstChild
+	for tdnode := trnode.FirstChild; tdnode != nil; tdnode = tdnode.NextSibling {
+		if tdnode.FirstChild != nil {
+			currentKey = tdnode.FirstChild.Data
+		} else {
+			data[currentKey] = tdnode.Data
+
+		}
+	}
+	return data
 
 }
 
@@ -148,7 +161,13 @@ func main() {
 				return
 			}
 
-			findTable(doc)
+			allTables := findTables(doc)
+			fmt.Println("the value of the tables are:")
+			fmt.Println(allTables)
+			tableData := parseHTMLTable(allTables[0])
+			for key, value := range tableData {
+				fmt.Printf("Key: %s, Value: %s\n", key, value)
+			}
 			logger.Printf("you are trying to get info for %s", stationOptions.stationId)
 		}
 	}
