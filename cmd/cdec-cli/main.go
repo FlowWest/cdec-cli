@@ -38,30 +38,36 @@ type stationOptions struct {
 func findTables(n *html.Node) []*html.Node {
 	var tables []*html.Node
 
-	var findTable func(n *html.Node)
-	findTable = func(*html.Node) {
+	var findTable func(*html.Node)
+	findTable = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "table" {
 			tables = append(tables, n)
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			findTable(c)
 		}
-
 	}
+
+	findTable(n)
 	return tables
 }
 
 func parseHTMLTable(n *html.Node) map[string]string {
-	var data map[string]string
+	data := make(map[string]string)
 	var currentKey string
-	tbody := n.FirstChild
-	trnode := tbody.FirstChild
+	var tbodyNode *html.Node
+	for child := n.FirstChild; child != nil; child = child.NextSibling {
+		if child.Type == html.ElementNode && child.Data == "tbody" {
+			tbodyNode = child
+			break
+		}
+	}
+	trnode := tbodyNode.FirstChild
 	for tdnode := trnode.FirstChild; tdnode != nil; tdnode = tdnode.NextSibling {
-		if tdnode.FirstChild != nil {
-			currentKey = tdnode.FirstChild.Data
+		if tdnode.FirstChild.Type == html.ElementNode && tdnode.FirstChild.Data == "b" {
+			currentKey = tdnode.FirstChild.FirstChild.Data
 		} else {
-			data[currentKey] = tdnode.Data
-
+			data[currentKey] = tdnode.FirstChild.Data
 		}
 	}
 	return data
@@ -149,6 +155,7 @@ func main() {
 
 			u.RawQuery = params.Encode()
 
+			fmt.Printf("the url: %s\n", u.String())
 			resp, err := http.Get(u.String())
 			if err != nil {
 				logger.Println("error trying to reach the statiosn endpoint")
@@ -160,10 +167,9 @@ func main() {
 				logger.Println("error trying to parse the body")
 				return
 			}
-
 			allTables := findTables(doc)
-			fmt.Println("the value of the tables are:")
-			fmt.Println(allTables)
+			fmt.Printf("the type for the table: %T\n", allTables[0])
+			fmt.Println("total tables found:", len(allTables))
 			tableData := parseHTMLTable(allTables[0])
 			for key, value := range tableData {
 				fmt.Printf("Key: %s, Value: %s\n", key, value)
