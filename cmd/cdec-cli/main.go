@@ -186,6 +186,10 @@ Query station metadata by providing a station id.
 				return
 			}
 			allTables := findTables(doc)
+			if len(allTables) == 0 {
+				fmt.Printf("Station: %s was not found in the system\n", stationOptions.stationId)
+				os.Exit(1)
+			}
 			tableData := parseHTMLMetadataTable(allTables[0])
 			keylen := 0
 			vallen := 0
