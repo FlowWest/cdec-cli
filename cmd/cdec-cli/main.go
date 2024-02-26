@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -186,8 +187,20 @@ Query station metadata by providing a station id.
 			}
 			allTables := findTables(doc)
 			tableData := parseHTMLMetadataTable(allTables[0])
+			keylen := 0
+			vallen := 0
 			for key, value := range tableData {
-				fmt.Printf("%s - %s\n", key, value)
+				if len(key) > keylen {
+					keylen = len(key)
+				}
+				if len(value) > vallen {
+					vallen = len(value)
+				}
+			}
+
+			for key, value := range tableData {
+				fmt.Printf("%-*s%*s\n", keylen, key, vallen, value)
+				fmt.Println(strings.Repeat("-", keylen+vallen+2))
 			}
 			fmt.Printf("\n\nView additional details: %s\n", u.String())
 			fmt.Printf("View on a map: %s&sta=%s", cdecUrls["nearbyMap"], stationOptions.stationId)
