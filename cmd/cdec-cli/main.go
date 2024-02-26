@@ -95,11 +95,13 @@ func main() {
 		fmt.Println("")
 		fmt.Println("These are commands available on cdec-cli, as well as few examples for each")
 		usageQuery := `
-Query data from CDEC services by providing a station id, sensor number and duration code
+data - Query data from CDEC services by providing a station id, sensor number and duration code
 	cdec-cli query -station=WLK -sensor=01 -duration=e -startdate=2024-02-01 enddate=2024-02-02 
+	cdec-cli query -help
 
-Query station metadata by providing a station id.
-	cdec-cli station -stationID=WLK
+stations - Query station metadata by providing a station id.
+	cdec-cli stations -stationID=WLK
+	cdec-cli stations -help
 		`
 		fmt.Println(usageQuery)
 		os.Exit(1)
