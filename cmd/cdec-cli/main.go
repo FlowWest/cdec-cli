@@ -57,13 +57,7 @@ func findTables(n *html.Node) []*html.Node {
 func parseHTMLMetadataTable(n *html.Node) map[string]string {
 	data := make(map[string]string)
 	var currentKey string
-	var tbodyNode *html.Node
-	for child := n.FirstChild; child != nil; child = child.NextSibling {
-		if child.Type == html.ElementNode && child.Data == "tbody" {
-			tbodyNode = child
-			break
-		}
-	}
+	tbodyNode := getTbodyInTable(n)
 	for trnode := tbodyNode.FirstChild; trnode != nil; trnode = trnode.NextSibling {
 
 		for tdnode := trnode.FirstChild; tdnode != nil; tdnode = tdnode.NextSibling {
@@ -78,6 +72,38 @@ func parseHTMLMetadataTable(n *html.Node) map[string]string {
 
 }
 
+func getTbodyInTable(n *html.Node) *html.Node {
+	for child := n.FirstChild; child != nil; child = child.NextSibling {
+
+		if child.Type == html.ElementNode && child.Data == "tbody" {
+			return child
+		}
+	}
+	return nil
+}
+
+//	func parseHTMLSensorsTable(n *html.Node) ([]string, []string) {
+//		tbodyNode := getTbodyInTable(n)
+//		var headerRow []string
+//		var dataRows []string
+//		for trnode := tbodyNode.FirstChild; trnode != nil; trnode = trnode.NextSibling {
+//			if trnode.FirstChild.Type == html.ElementNode && trnode.FirstChild.Data == "th" {
+//				for thnode := trnode.FirstChild; thnode != nil; thnode = thnode.NextSibling {
+//					headerRow = append(headerRow, thnode.FirstChild.FirstChild.Data)
+//					fmt.Printf("appending the value %s\n", thnode.FirstChild.FirstChild.Data)
+//				}
+//			} else if trnode.FirstChild.Type == html.ElementNode && trnode.FirstChild.Data == "td" {
+//				// parse the data rows
+//				rownum := 0
+//				for tdnode := trnode.FirstChild; tdnode != nil; tdnode = tdnode.NextSibling {
+//					dataRows = append(dataRows, tdnode.FirstChild.FirstChild.Data)
+//					rownum += 1
+//				}
+//			}
+//		}
+//		return headerRow, dataRows
+//
+// }
 func main() {
 	// fmt.Println("Welcome to the CDEC CLI!")
 	asciiArt := `
@@ -208,6 +234,10 @@ stations - Query station metadata by providing a station id.
 				fmt.Printf("%-*s%*s\n", keylen, key, vallen, value)
 				fmt.Println(strings.Repeat("-", keylen+vallen+2))
 			}
+
+			// parseHTMLSensorsTable(allTables[1])
+			// stationSensorsNode := allTables[1]
+
 			fmt.Printf("\n\nView additional details: %s\n", u.String())
 			fmt.Printf("View on a map: %s&sta=%s", cdecUrls["nearbyMap"], stationOptions.stationId)
 		}
